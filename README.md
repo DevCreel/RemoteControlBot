@@ -1,6 +1,6 @@
 ### Windows remote control bot ###
 
-1. Install [Python](https://www.python.org/downloads/).
+1. Install [Python](https://www.python.org/downloads/)
 2. Start powershell as administrator and run `py -m pip install telepot`
 3. Create your [Telegram bot](https://core.telegram.org/bots)
 4. Run cmd (Win+R) and enter `shell:startup`. In the folder that opens, create a `RemoteControlBot.bat` file with content:
