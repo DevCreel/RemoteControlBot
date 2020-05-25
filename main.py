@@ -5,6 +5,7 @@ def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
 
     if (content_type == 'text' and chat_id and msg['chat']['id'] == chat_id):
+        cmd_repeat = 1
         command = msg['text']
         markup = ReplyKeyboardMarkup(keyboard=[
             ['⏮ Previous track', '⏯ Play/Pause', '⏭ Next track'],
@@ -31,9 +32,11 @@ def handle(msg):
 
         elif  '🔼 Volume up' == command:
             cmd = keypress % '0xAF'
+            cmd_repeat = 2
 
         elif  '🔽 Volume down' == command:
             cmd = keypress % '0xAE'
+            cmd_repeat = 2
 
         elif  '⏭ Next track' == command:
             cmd = keypress % '0xB0'
@@ -45,10 +48,11 @@ def handle(msg):
             cmd = keypress % '0xB3'
 
         else:
-            cmd = None
+            cmd_repeat = None
 
-        if cmd:
-            subprocess.Popen(cmd, shell=True)
+        if cmd_repeat:
+            for number in range(cmd_repeat):
+                subprocess.Popen(cmd, shell=True)
 
 # get settings from command-line
 TOKEN = sys.argv[1]
