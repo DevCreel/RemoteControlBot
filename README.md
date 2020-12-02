@@ -12,5 +12,7 @@ Where:
 - {DIR} - folder with RemoteControlBot files
 - {TOKEN} - your bot token
 - {CHAT_ID} - your Telegram account chat_id (optional param to secure your connection)
-6. Doubleclick `RemoteControlBot.bat` to start script
-7. Send message `/start` to your bot
+6. If you are using Windows 10, then you need to start the powershell in administrator mode and run the command
+`Set-ExecutionPolicy unrestricted`
+7. Doubleclick `RemoteControlBot.bat` to start script
+8. Send message `/start` to your bot
