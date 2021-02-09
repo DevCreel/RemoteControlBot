@@ -1,4 +1,4 @@
-import sys, telepot, time, subprocess, os
+import sys, telepot, time, subprocess, os, psutil
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
 def handle(msg):
@@ -6,45 +6,64 @@ def handle(msg):
 
     if (content_type == 'text' and chat_id and msg['chat']['id'] == chat_id):
         cmd_repeat = 1
+        response = None
         command = msg['text']
         markup = ReplyKeyboardMarkup(keyboard=[
-            ['⏮ Previous track', '⏯ Play/Pause', '⏭ Next track'],
-            ['🔽 Volume down', '🔈 Mute', '🔼 Volume up'],
-            ['🖥 Turn off screen', '🔅 Set brightness 10%', '🔆 Set brightness 100%']
+            ['⏮ Назад', '⏯ Играть/Пауза', '⏭ Далее'],
+            ['🔽 Тише', '🔈 Звук', '🔼 Громче'],
+            ['🖥 Выключить экран', '🔅 Яркость 10%', '🔆 Яркость 100%'],
+            ['⚙️ Статус', '🟠 Перезагрузка', '🔴 Выключение'],
         ])
 
-        bot.sendMessage(chat_id, 'Got command: %s' % command, reply_markup=markup)
-
         if command == '/start':
-            bot.sendMessage (chat_id, str("Hi! Which one do you want? choose from the below keyboard buttons."), reply_markup=markup)
+            bot.sendMessage (chat_id, str("Добро пожаловать!"), reply_markup=markup)
 
-        elif '🔅 Set brightness 10%' == command:
+        elif '🔴 Выключение' == command:
+            cmd = 'shutdown /s /f /t 0'
+            response = "Компьютер сейчас будет выключен"
+
+        elif '🟠 Перезагрузка' == command:
+            cmd = 'shutdown /r'
+            response = "Компьютер сейчас будет перезагружен"
+
+        elif '⚙️ Статус' == command:
+            cmd_repeat = None
+
+            response = "CPU: " + str(psutil.cpu_percent()) + "%"
+            response += "\nОЗУ: " + str(
+                int(psutil.virtual_memory().percent)) + "%"
+            if psutil.sensors_battery():
+                response += "\nБатарея: " + str(format(psutil.sensors_battery().percent, ".0f")) + "%"
+                if psutil.sensors_battery().power_plugged is True:
+                    response += "  🔌"
+
+        elif '🔅 Яркость 10%' == command:
             cmd = brightness % 10
 
-        elif  '🔆 Set brightness 100%' == command:
+        elif  '🔆 Яркость 100%' == command:
             cmd = brightness % 100
 
-        elif  '🖥 Turn off screen' == command:
+        elif  '🖥 Выключить экран' == command:
             cmd = screen_off
 
-        elif  '🔈 Mute' == command:
+        elif  '🔈 Звук' == command:
             cmd = keypress % '0xAD'
 
-        elif  '🔼 Volume up' == command:
+        elif  '🔼 Громче' == command:
             cmd = keypress % '0xAF'
             cmd_repeat = 2
 
-        elif  '🔽 Volume down' == command:
+        elif  '🔽 Тише' == command:
             cmd = keypress % '0xAE'
             cmd_repeat = 2
 
-        elif  '⏭ Next track' == command:
+        elif  '⏭ Далее' == command:
             cmd = keypress % '0xB0'
 
-        elif  '⏮ Previous track' == command:
+        elif  '⏮ Назад' == command:
             cmd = keypress % '0xB1'
 
-        elif  '⏯ Play/Pause' == command:
+        elif  '⏯ Играть/Пауза' == command:
             cmd = keypress % '0xB3'
 
         else:
@@ -53,6 +72,11 @@ def handle(msg):
         if cmd_repeat:
             for number in range(cmd_repeat):
                 subprocess.Popen(cmd, shell=True)
+
+        if response:
+            bot.sendMessage(chat_id, response, reply_markup=markup)
+        else:
+            bot.sendMessage(chat_id, 'Команда: %s' % command, reply_markup=markup)
 
 # get settings from command-line
 TOKEN = sys.argv[1]
